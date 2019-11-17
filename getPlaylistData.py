@@ -3,6 +3,9 @@ import spotipy
 import json
 import pprint
 import requests
+import simplejson
+
+import urllib.request
 
 '''
 In order to use this file, provide the following in credentials.json:
@@ -15,6 +18,16 @@ In order to use this file, provide the following in credentials.json:
 
 '''
 
+GENRES=[
+    'rock',
+    'pop',
+    'rnb',
+    'country',
+    'hiphop',
+    'indie_alt',
+    'edm_dance',
+]
+
 def main():
     f = open("./credentials.json")
     obj = json.load(f)
@@ -23,48 +36,66 @@ def main():
     userID = obj['userID']
 
     sp = spotipy.Spotify(auth=token)
-    topPlaylists = sp.category_playlists(category_id='toplists', country='us')
-    
+
     resultDict = dict()
-    results = list()
-    for playlist in topPlaylists['playlists']['items']:
-        id = playlist['id']
+    for genre in GENRES:
+        print('fetching information for', genre)
+        categoryPlaylists = sp.category_playlists(category_id=genre, country='us', limit=10)
+        
+        results = list()
+        for playlist in categoryPlaylists['playlists']['items']:
+            id = playlist['id']
+            print('    fetching information for', id)
 
-        getReq = 'https://api.spotify.com/v1/playlists/' + id
+            getReq = 'https://api.spotify.com/v1/playlists/' + id
 
-        r = requests.get(url=getReq, 
-                        headers={
-                            'Authorization': 'Bearer ' + token
-                        }
-                    )
+            r = requests.get(url=getReq,  headers={'Authorization': 'Bearer ' + token})
 
-        tracks = r.json()['tracks']['items']
+            tracks = r.json()['tracks']['items']
 
-        for track in tracks:
-            trackDict = dict()
-            trackData = track['track']
-            
-            audioFeatures = sp.audio_features(tracks=[trackData['id']])
-            
-            trackDict['title'] = trackData['name']
-            trackDict['artist'] = trackData['artists'][0]['name']
+            for track in tracks:
+                trackDict = dict()
+                try:
+                    trackData = track['track']
 
-            artistID = trackData['artists'][0]['id']
+                    audioFeatures = sp.audio_features(tracks=[trackData['id']])
 
-            artistInfo = sp.artist(artistID)
-            genres = artistInfo['genres']
+                    trackDict['title'] = trackData['name']
+                    trackDict['artist'] = trackData['artists'][0]['name']
 
-            trackDict['genres'] = genres
-            trackDict['imageURL'] = trackData['album']['images'][1]['url']
-            trackDict['trackID'] = trackData['id']
-            trackDict['features'] = audioFeatures
+                    artistID = trackData['artists'][0]['id']
 
-            results.append(trackDict)
+                    artistInfo = sp.artist(artistID)
 
-    resultDict['results'] = results
+                    genres = artistInfo['genres']
 
-    with open('result.json', 'w') as fp:
-        json.dump(results, fp)
+                    trackDict['genre'] = genre
+                    trackDict['imageURL'] = trackData['album']['images'][1]['url']
+                    trackDict['trackID'] = trackData['id']
+                    trackDict['features'] = audioFeatures
+
+                    results.append(trackDict)
+                except:
+                    continue
+
+        resultDict[genre] = results
+
+        print('downloading images for', genre)
+        for track in results:
+            try:
+                imageURL = track['imageURL']
+                title = track['title'].lower()
+                artist = track['artist'].lower()
+                genre = track['genre'].lower()
+                urllib.request.urlretrieve(
+                    imageURL, 'covers/'+genre+'/'+artist+' - '+title+'.jpg'
+                )
+            except:
+                continue
+
+    output = open('dataByCategory.json', 'w')
+
+    pprint.pprint(resultDict, output)
 
 if __name__=='__main__':
     main()
