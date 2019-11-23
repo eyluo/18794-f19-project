@@ -1,3 +1,7 @@
 *.json
 !dataByCategory*
 covers*
+data/matlab
+edges
+*~
+.DS_Store
