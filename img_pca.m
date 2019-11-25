@@ -16,9 +16,10 @@ for i=1:size(genres, 1)
         genrePath = strcat(PICTURE_PATH, '/', genre);
         pictures = dir(genrePath);
         disp("Constructing matrix for " + genre + "...");
-        X = [];
+        X = zeros(800, 90000);
         
         % Create covariance matrix for genre.
+        idx = 1;
         for j=1:size(pictures, 1)
             picture = pictures(j).name;
             if ~any(strcmp(exclude, picture))
@@ -34,9 +35,12 @@ for i=1:size(genres, 1)
                 rowA = reshape(A, 1, size(A,1)*size(A,2));
                 resizedA = [rowA zeros(1, 300*300-size(A,1)*size(A,2))];
                 
-                X = [X ; resizedA];
+                X(idx,:) = resizedA;
+                idx = idx + 1;
             end
         end
+        
+        X = X(1:idx,:);
         
         close all;
         disp("Performing PCA for "+genre+"...");
