@@ -48,38 +48,12 @@ for i=1:size(genres, 1)
         [coeffs,~,~,~,~,genreAvg] = pca(X);
         toc;
         imshow(uint8(reshape(genreAvg, 300, 300)));
-        pause;
-             
-        % Demonstrate reconstruction of each image.
-        for j=1:size(pictures, 1)
-            picture = pictures(j).name;
-            if ~any(strcmp(exclude, picture))
-                picturePath = strcat(genrePath, '/', picture);
-                A = double(imread(picturePath));
-                
-                % If picture is in RGB, convert down to grayscale.
-                dims = size(A);
-                if size(dims, 2) > 2
-                    A = double(rgb2gray(uint8(A)));
-                end
-                
-                rowA = reshape(A, 1, size(A,1)*size(A,2));
-                resizedA = [rowA zeros(1, 300*300-size(A,1)*size(A,2))];
-                                
-                % Rebuild image.
-                reconstructedImg = genreAvg;
-                for k=1:NUM_DIM
-                    eigenv = coeffs(:, k);
-                    p_k = (resizedA - genreAvg) * eigenv;
-                    reconstructedImg = reconstructedImg + p_k * transpose(eigenv);
-                    
-                    if mod(k, 50) == 0
-                        close all;
-                        imshow(uint8(reshape(reconstructedImg, 300, 300)));
-                        pause;
-                    end
-                end
-            end
-        end        
+        
+        filename = strcat(DATA_PATH,'/',genre,'_avg.mat');
+        save(filename, 'genreAvg');
+        
+        topDims = coeffs(:,1:NUM_DIM);
+        filename = strcat(DATA_PATH,'/',genre,'_vectors.mat');
+        save(filename, 'topDims');
     end
 end
