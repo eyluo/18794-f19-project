@@ -1,6 +1,6 @@
 %I = imread('../covers/rock/zz top - cheap sunglasses.jpg');
-I = imread('../covers/rock/yungblud - hope for the underrated youth.jpg');
-%I = imread('covers/rock/walter egan - magnet and steel.jpg');
+%I = imread('../../covers/rock/yungblud - hope for the underrated youth.jpg');
+I = imread('../../covers/rock/walter egan - magnet and steel.jpg');
 %I = imread('covers/rock/u2 - pride (in the name of love).jpg');
 %I = imread('covers/edm_dance/zac brown band - someone i used to know - kue radio remix.jpg');
 %I = imread('covers/hiphop/yung mal - war (feat. gunna).jpg');

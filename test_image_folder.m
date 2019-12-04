@@ -9,5 +9,5 @@ S = dir(fullfile(Drock,'*.jpg'))
 for k = 1:numel(S)
     F = fullfile(Drock,S(k).name);
     I = imread(F);
-    high_gradient_count(I)
+    high_gradient_count(I);
 end
