@@ -1,7 +1,7 @@
 PICTURE_PATH = './covers';
 DATA_PATH = './data/matlab';
 
-NUM_DIM = 300;
+NUM_DIM = 500;
 
 genres = dir(PICTURE_PATH);
 exclude = [".DS_Store" "." ".."];
@@ -52,7 +52,7 @@ for i=1:size(genres, 1)
         filename = strcat(DATA_PATH,'/',genre,'_avg.mat');
         save(filename, 'genreAvg');
         
-        topDims = coeffs(:,1:NUM_DIM);
+        topDims = coeffs(:,1:size(coeffs,2));
         filename = strcat(DATA_PATH,'/',genre,'_vectors.mat');
         save(filename, 'topDims');
     end

@@ -2,6 +2,7 @@
 !dataByCategory*
 covers*
 data/matlab
+data/test
 edges
 *~
 .DS_Store
